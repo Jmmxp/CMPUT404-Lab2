@@ -35,5 +35,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         while True:
             conn, addr = proxy.accept()
             p = Process(target=handle_client, args=(server, conn, addr,))
+            p.daemon = True
             p.start()
-            p.join()
+            conn.close()

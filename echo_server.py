@@ -10,7 +10,7 @@ def handle_client(conn, addr):
             data = conn.recv(1024)
             if not data: break
 
-            # Print anything that is sent to our server program.
+            # Print/echo anything that is sent to our server program.
             print(data)
             conn.sendall(data)
 
@@ -25,5 +25,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         conn, addr = s.accept()
         p = Process(target=handle_client, args=(conn, addr,))
+        p.daemon = True
         p.start()
-        p.join()
+    conn.close()
