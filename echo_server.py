@@ -27,4 +27,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         p = Process(target=handle_client, args=(conn, addr,))
         p.daemon = True
         p.start()
-    conn.close()
+        conn.close()
