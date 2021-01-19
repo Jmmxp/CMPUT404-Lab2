@@ -1,5 +1,23 @@
 # Code skeleton from official Python socket library documentation at https://docs.python.org/3/library/socket.html
 import socket
+from multiprocessing import Process
+
+def handle_client(server, conn, addr):
+    with conn:
+        print("Incoming connection from", addr)
+        while True:
+            # Get data from the client
+            client_data = conn.recv(1024)
+            if not client_data: break
+
+            # Forward that data to the server
+            server.sendall(client_data)
+
+            # Take the servers's response and return it back to the client
+            server_data = server.recv(1024)
+            if not server_data: break
+
+            conn.sendall(server_data)
 
 HOST = "www.google.com" # The remote host
 PORT = 80 # The same port as used by the server
@@ -12,19 +30,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         proxy.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         proxy.bind((PROXY_HOST, PROXY_PORT))
         proxy.listen(1)
-        conn, addr = proxy.accept()
-        with conn:
-            print("Incoming connection from", addr)
-            while True:
-                # Get data from the client
-                client_data = conn.recv(1024)
-                if not client_data: break
-
-                # Forward that data to the server
-                server.sendall(client_data)
-
-                # Take the servers's response and return it back to the client
-                server_data = server.recv(1024)
-                if not server_data: break
-
-                conn.sendall(server_data)
+        
+        # Listen for any incoming client connections until the server is forcefully shut-down.
+        while True:
+            conn, addr = proxy.accept()
+            p = Process(target=handle_client, args=(server, conn, addr,))
+            p.start()
+            p.join()

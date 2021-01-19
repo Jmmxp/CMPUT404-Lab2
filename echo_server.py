@@ -13,7 +13,7 @@ def handle_client(conn, addr):
             # Print anything that is sent to our server program.
             print(data)
             conn.sendall(data)
-            
+
 HOST = "" # Symbolic name meaning all available interfaces
 PORT = 8001 # Chose this port as it is the one used in the lab questions.
 
